@@ -134,7 +134,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: ${{ !matrix.cross && matrix.target || '' }}
 
       - uses: Swatinem/rust-cache@v2
         with:

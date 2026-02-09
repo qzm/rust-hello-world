@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/qzm/rust-hello-world)](https://github.com/qzm/rust-hello-world/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A minimal Rust project with cross-platform CI/CD pipeline, building and releasing binaries for **9 platforms x 33 targets**.
+A minimal Rust project with cross-platform CI/CD pipeline, building and releasing binaries for **9 platforms x 29 targets**.
 
 ## Quick Start
 
@@ -54,10 +54,6 @@ wasmtime rust-hello-world.wasm
 | s390x | `s390x-unknown-linux-gnu` |
 | RISC-V 64 | `riscv64gc-unknown-linux-gnu` |
 | SPARC64 | `sparc64-unknown-linux-gnu` |
-| MIPS (big-endian) | `mips-unknown-linux-gnu` |
-| MIPS (little-endian) | `mipsel-unknown-linux-gnu` |
-| MIPS64 (big-endian) | `mips64-unknown-linux-gnuabi64` |
-| MIPS64 (little-endian) | `mips64el-unknown-linux-gnuabi64` |
 | LoongArch64 | `loongarch64-unknown-linux-gnu` |
 
 ### Linux (musl, static)
@@ -143,7 +139,7 @@ git push origin v0.2.0
 
 The release will include:
 
-- Pre-built binaries for all 33 targets (`.tar.gz` / `.zip`)
+- Pre-built binaries for all 29 targets (`.tar.gz` / `.zip`)
 - Source code archives with version prefix (`-source.tar.gz` / `-source.zip`)
 
 ## Project Structure

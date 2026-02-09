@@ -18,27 +18,112 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Linux
+          # ── Linux glibc ──
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
+          - target: i686-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-latest
             cross: true
           - target: armv7-unknown-linux-gnueabihf
             os: ubuntu-latest
             cross: true
+          - target: arm-unknown-linux-gnueabihf
+            os: ubuntu-latest
+            cross: true
+          - target: thumbv7neon-unknown-linux-gnueabihf
+            os: ubuntu-latest
+            cross: true
+          - target: powerpc64le-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: s390x-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: riscv64gc-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: sparc64-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: mips-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: mipsel-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: mips64-unknown-linux-gnuabi64
+            os: ubuntu-latest
+            cross: true
+          - target: mips64el-unknown-linux-gnuabi64
+            os: ubuntu-latest
+            cross: true
+          - target: loongarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
 
-          # macOS
+          # ── Linux musl (static, Alpine/Docker friendly) ──
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            cross: true
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            cross: true
+          - target: armv7-unknown-linux-musleabihf
+            os: ubuntu-latest
+            cross: true
+
+          # ── macOS ──
           - target: x86_64-apple-darwin
             os: macos-latest
           - target: aarch64-apple-darwin
             os: macos-latest
 
-          # Windows
+          # ── iOS ──
+          - target: aarch64-apple-ios
+            os: macos-latest
+
+          # ── Windows MSVC ──
           - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: i686-pc-windows-msvc
             os: windows-latest
           - target: aarch64-pc-windows-msvc
             os: windows-latest
+
+          # ── Windows GNU ──
+          - target: x86_64-pc-windows-gnu
+            os: windows-latest
+
+          # ── FreeBSD ──
+          - target: x86_64-unknown-freebsd
+            os: ubuntu-latest
+            cross: true
+
+          # ── NetBSD ──
+          - target: x86_64-unknown-netbsd
+            os: ubuntu-latest
+            cross: true
+
+          # ── illumos (Solaris derivative) ──
+          - target: x86_64-unknown-illumos
+            os: ubuntu-latest
+            cross: true
+
+          # ── Android ──
+          - target: aarch64-linux-android
+            os: ubuntu-latest
+            cross: true
+          - target: x86_64-linux-android
+            os: ubuntu-latest
+            cross: true
+
+          # ── WebAssembly ──
+          - target: wasm32-wasip1
+            os: ubuntu-latest
+            wasm: true
 
     runs-on: ${{ matrix.os }}
     env:
@@ -60,10 +145,15 @@ jobs:
         run: cargo install cross --git https://github.com/cross-rs/cross
 
       - name: Build
+        if: ${{ !matrix.wasm }}
         run: ${{ matrix.cross && 'cross' || 'cargo' }} build --release --locked --target ${{ matrix.target }}
 
+      - name: Build (WASM)
+        if: matrix.wasm
+        run: cargo build --release --locked --target ${{ matrix.target }}
+
       - name: Package (Unix)
-        if: runner.os != 'Windows'
+        if: runner.os != 'Windows' && !matrix.wasm
         run: |
           cd target/${{ matrix.target }}/release
           tar czf ../../../${{ env.BINARY_NAME }}-${VERSION}-${{ matrix.target }}.tar.gz ${{ env.BINARY_NAME }}
@@ -74,6 +164,12 @@ jobs:
         run: |
           cd target/${{ matrix.target }}/release
           7z a ../../../${{ env.BINARY_NAME }}-${env:VERSION}-${{ matrix.target }}.zip ${{ env.BINARY_NAME }}.exe
+
+      - name: Package (WASM)
+        if: matrix.wasm
+        run: |
+          cd target/${{ matrix.target }}/release
+          tar czf ../../../${{ env.BINARY_NAME }}-${VERSION}-${{ matrix.target }}.tar.gz ${{ env.BINARY_NAME }}.wasm
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
